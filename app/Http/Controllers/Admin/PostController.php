@@ -24,7 +24,7 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create() {
-        //
+        return view('admin.posts.create');
     }
 
     /**
@@ -34,7 +34,13 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function store(StorePostRequest $request) {
-        //
+        $form_data = $request->validated();
+        $form_data['slug'] = Post::generateSlug($form_data['title']);
+        // $post = new Post();
+        // $post->fill($form_data);
+        // $post->save();
+        $post = Post::create($form_data);
+        return redirect()->route('admin.posts.index')->with('message', 'Il post è sato creato con successo');
     }
 
     /**
@@ -54,7 +60,7 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function edit(Post $post) {
-        //
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -65,7 +71,12 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(UpdatePostRequest $request, Post $post) {
-        //
+        // dd($request->validated());
+        $form_data = $request->all();
+        $form_data['slug'] = Post::generateSlug($form_data['title']);
+        $post->update($form_data);
+
+        return redirect()->route('admin.posts.index')->with('message', "$post->title è stato aggiornato con successo");
     }
 
     /**
@@ -75,6 +86,7 @@ class PostController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function destroy(Post $post) {
-        //
+        $post->delete();
+        return redirect()->route('admin.posts.index')->with('message', "$post->title è stato cancellato");
     }
 }
